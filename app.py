@@ -1,5 +1,5 @@
 import streamlit as st
-from google import genai
+import google.generativeai as genai
 
 st.set_page_config(page_title="AI Webtoon & Shorts Script Generator", layout="wide")
 st.title("🎬 숏폼 애니메이션 & 웹툰 스크립트 생성기")
@@ -8,8 +8,8 @@ st.title("🎬 숏폼 애니메이션 & 웹툰 스크립트 생성기")
 if "GEMINI_API_KEY" not in st.secrets:
     st.error("Gemini API key is missing. Please add it to your Streamlit Cloud Secrets.")
 else:
-    # Initialize Gemini client
-    client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+    # Initialize Gemini client using the standard library
+    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
     genre = st.selectbox("장르 선택", ["일상 공감 코미디", "로맨스 / 학원물", "신입사원 / 회사 생활", "판타지 / 환생물"])
     topic = st.text_input("오늘의 에피소드 주제 (예: 지하철에서 아는 사람 만났을 때)")
@@ -28,10 +28,9 @@ else:
                 2. 각 장면별 AI 이미지 생성용 영어 프롬프트 (Midjourney/FLUX 스타일, Korean webtoon character style)
                 """
                 
-                response = client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=prompt
-                )
+                # Using the stable model
+                model = genai.GenerativeModel('gemini-1.5-flash')
+                response = model.generate_content(prompt)
                 
                 st.success("생성 완료!")
                 st.markdown(response.text)
